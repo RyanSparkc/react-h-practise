@@ -25,12 +25,18 @@ function App() {
     </div>
 
     {/* 1. JSX 不會呈現物件型別以及特定的原始型別 */}
-
+    <div>null: {null}</div>
+    <div>undefined: {undefined}</div>
+    <div>布林值 true: {true}</div>
+    <div>布林值 false: {false}</div>
 
     {/* 2. 陣列中的值會直接呈現在畫面上 */}
+    <div>{['蘋果', '香蕉', '鳳梨', 123, true, null, undefined]}</div>
 
     <ul className="list-group list-group-flush">
-
+      <li className="list-group-item">An item</li>
+      <li className="list-group-item">A second item</li>
+      <li className="list-group-item">A third item</li>
     </ul>
   </div>
 }

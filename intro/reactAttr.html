@@ -12,21 +12,40 @@
 
     return (
       <div>
-        {/* className */}
+        {/* className - class 改為 className */}
+        <div><button type="button" className="btn btn-primary">Primary</button></div>
 
-        {/* checked 與 結尾標籤 */}
+        {/* checked 與 結尾標籤 - 使用 defaultChecked，標籤需正確結尾 */}
+        <div><input type="checkbox" defaultChecked /></div>
 
-        {/* defaultValue & value */}
+        {/* defaultValue & value - 使用 defaultValue 避免受控制元件問題 */}
+        <div><input type="text" defaultValue="卡斯伯" /></div>
 
-        {/* htmlFor */}
+        {/* htmlFor - for 改為 htmlFor */}
+        <div>
+          <label htmlFor="email">請輸入 Email</label>
+          <input type="email" id="email" />
+        </div>
 
-        {/* selected */}
+        {/* selected - 使用 select 的 defaultValue */}
+        <div>
+          <select defaultValue="2">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+          </select>
+        </div>
 
-        { /* textarea */ }
+        {/* textarea - 內容使用 defaultValue */}
+        <div>
+          <textarea cols="30" rows="5" defaultValue="這裡可以放多行文字"></textarea>
+        </div>
 
-        {/* dangerouslySetInnerHTML */}
+        {/* dangerouslySetInnerHTML - 插入原始 HTML */}
+        <div dangerouslySetInnerHTML={{ __html: htmlTemplate }}></div>
 
-        {/* onChange */}
+        {/* onChange - 監聽輸入變化 */}
+        <div><input type="text" onChange={(e) => console.log(e.target.value)} /></div>
 
       </div>
     );

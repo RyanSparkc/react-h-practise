@@ -17,9 +17,22 @@
         'Lorem ipsum dolor sit amet consectetur, adipisicing elit. Modi culpa aspernatur tempore cupiditate illo minima voluptatem blanditiis optio accusantium earum voluptate magni repellendus, ipsa dolor adipisci libero qui commodi veritatis.',
       link: 'https://www.casper.tw/',
     };
+
+    // inline style 使用物件，屬性名稱改為 camelCase
+    const cardStyle = {
+      width: '18rem'
+    };
+
+    const imgStyle = {
+      height: '200px',
+      backgroundImage: `url('${data.imageUrl}')`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center center'
+    };
+
     return (
-      <div className='card'>
-        <div className='card-img-top'></div>
+      <div className='card' style={cardStyle}>
+        <div className='card-img-top' style={imgStyle}></div>
         <div className='card-body'>
           <h5 className='card-title'>{data.name}</h5>
           <p className='card-text'>{data.description}</p>
@@ -30,6 +43,10 @@
       </div>
     );
   }
+
+  const el = document.getElementById('root');
+  const root = ReactDOM.createRoot(el);
+  root.render(<App />);
 </script>
 
 <div class="card" style="width: 18rem">
