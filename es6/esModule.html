@@ -10,27 +10,39 @@
 // #1-1 將標籤定義 <script type="module">
 // #1-2 預設匯出：defaultExport.js
 // 常見的匯出方式，通常用於匯出物件，在 React 開發中可用來匯出元件
+// 範例：
+// export default {
+//   name: '小明',
+//   age: 18
+// }
 
 // #1-3 具名匯出：namedExport.js
-// 可用於匯出已定義的變數、物件、函式，專案開發中通常用於 “方法匯出”
-// 第三方的框架、函式、套件很常使用具名定義 “方法”
+// 可用於匯出已定義的變數、物件、函式，專案開發中通常用於 "方法匯出"
+// 第三方的框架、函式、套件很常使用具名定義 "方法"
+// 範例：
+// export const sum = (a, b) => a + b;
+// export const PI = 3.14159;
 
 // #2 匯入方法
 // #2-1 預設匯入
 // 因為預設匯出沒有名字，所以可以為它命名
-
+// import App from './App.js';           // ✅ 可以任意命名
+// import MyComponent from './App.js';   // ✅ 也可以這樣
 
 // #2-2 具名匯入
 // 單一匯入（建議寫法）
-
+// import { sum, PI } from './namedExport.js';  // ✅ 只匯入需要的
 
 // 全部匯入（不建議，錯誤較難發現）
-
+// import * as utils from './namedExport.js';   // ⚠️ 匯入全部並命名為 utils
+// console.log(utils.sum(1, 2));
 
 // #3 SideEffect
 // sideEffect.js（沒有包含匯出的檔案）
+// 直接執行檔案內的程式碼，不需要接收任何值
+// import './sideEffect.js';  // ✅ 只執行，不匯入
 
-
+console.log('ES Module 範例說明 - 請查看程式碼註解');
 </script>
 <!-- 🙇🙇練習結束🙇🙇 -->
 </main>

@@ -6,35 +6,49 @@
 <div id="root"></div>
 <script type="text/babel">
 // #1 物件是以傳參考的形式賦值
-// const person = {
-//   name: '小明',
-//   obj: {}
-// }
+const person = {
+  name: '小明',
+  obj: { inner: '內層物件' }
+}
+const person2 = person; // ❌ 這只是複製「參考」，不是複製「值」
+person2.name = '杰倫';
+console.log(person.name);  // 杰倫（原本的 person 也被改了！）
+console.log(person === person2); // true（指向同一個記憶體位置）
 
-
-// #2 陷阱
-// const fn = (item) => {
-//   item.name = '杰倫';
-//   // ...
-// }
-
+// #2 陷阱：函式內修改參數會影響原始資料
+const fn = (item) => {
+  item.name = '杰倫'; // ❌ 這會修改到原始物件
+}
+const originalPerson = { name: '小明' };
+fn(originalPerson);
+console.log(originalPerson.name); // 杰倫（被修改了！）
 
 // 關於：這樣的錯誤，ESLint 也有建議不要這麼做（但你是有經驗的開發者時，下方也有提供關閉的方式）
 // https://cn.eslint.org/docs/rules/no-param-reassign
 
 // #3 解決方案
-// #3-1 淺層拷貝
-// const person = {
-//   name: '小明',
-//   obj: {}
-// }
+// #3-1 淺層拷貝（Shallow Copy）
+const personA = {
+  name: '小明',
+  obj: { inner: '內層' }
+}
+const personACopy = { ...personA }; // ✅ 展開運算子做淺層拷貝
+personACopy.name = '杰倫';
+console.log(personA.name);      // 小明（沒被改到）
+console.log(personACopy.name);  // 杰倫
+// ⚠️ 但淺層拷貝對於巢狀物件無效
+personACopy.obj.inner = '被改了';
+console.log(personA.obj.inner); // 被改了（巢狀物件還是被改到！）
 
-
-// #3-2 深層拷貝
-// const person = {
-//   name: '小明',
-//   obj: {}
-// }
+// #3-2 深層拷貝（Deep Copy）
+const personB = {
+  name: '小明',
+  obj: { inner: '內層' }
+}
+const personBCopy = JSON.parse(JSON.stringify(personB)); // ✅ 深層拷貝
+personBCopy.obj.inner = '被改了';
+console.log(personB.obj.inner);     // 內層（沒被改到）
+console.log(personBCopy.obj.inner); // 被改了
 
 const Card = ({ person }) => {
   return <div className="card">

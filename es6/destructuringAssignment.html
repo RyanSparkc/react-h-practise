@@ -5,16 +5,23 @@
 <!-- 🔥🔥練習開始🔥🔥 -->
 <div id="root"></div>
 <script type="text/babel">
-// #1 取出特定值作為變數
+// #1 取出特定值作為變數（物件解構）
 const person = {
   name: '小明',
   age: 16,
   like: '鍋燒意麵'
 }
+const { name, age, like } = person; // ✅ 解構賦值
+console.log(name, age, like); // 小明 16 鍋燒意麵
 
 // #2 陣列解構
 const array = ['小明', '杰倫', '漂亮阿姨'];
+const [first, second, third] = array; // ✅ 依序取出
+console.log(first, second, third); // 小明 杰倫 漂亮阿姨
 
+// 也可以跳過某些值
+const [, , auntie] = array;
+console.log(auntie); // 漂亮阿姨
 
 // #3 解構加展開
 const people = {
@@ -34,28 +41,36 @@ const people = {
     like: '名牌包'
   }
 }
+const { Ming, ...others } = people; // ✅ 解構 + 其餘展開
+console.log(Ming);    // { name: '小明', age: 16, like: '鍋燒意麵' }
+console.log(others);  // { Jay: {...}, Auntie: {...} }
 
 // #4 解構加上重新命名
-
+const { name: personName } = person; // ✅ 將 name 重新命名為 personName
+console.log(personName); // 小明
 
 // #5 函式參數解構
-
+const introduce = ({ name, age }) => {  // ✅ 直接在參數中解構
+  console.log(`我是 ${name}，今年 ${age} 歲`);
+}
+introduce(person); // 我是 小明，今年 16 歲
 
 
 // #6 解構在 React 的運用
-const { useState } = React;
+const { useState } = React; // ✅ 從 React 中解構出 useState
 
-function Card() {
+function Card({ person }) {  // ✅ 直接在 props 中解構
   return (<div className="card">
     <div className="card-body">
-
+      {person.name} 喜歡 {person.like}
     </div>
   </div>)
 }
 
 function App() {
-  const [person, setPerson] = useState({
+  const [person, setPerson] = useState({  // ✅ useState 回傳陣列，用解構取出
     name: '小明',
+    like: '鍋燒意麵'
   })
 
   return (

@@ -8,19 +8,39 @@
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script type="text/babel">
 // #1 Async function 的本質
-// const asyncFn = async () => {
-//   const res = await axios.get('https://jsonplaceholder.typicode.com/todos/1');
-// }
+// async function 本質上會回傳一個 Promise
+const asyncFn = async () => {
+  const res = await axios.get('https://jsonplaceholder.typicode.com/todos/1');
+  return res.data; // ✅ 這個值會被包在 Promise 中回傳
+}
 
+// 驗證：async function 回傳的是 Promise
+console.log(asyncFn()); // Promise { <pending> }
 
 
 // #2 Async function 回傳值
+// 取得 async function 回傳值的方法
+// 方法一：使用 .then()
+asyncFn().then((data) => {
+  console.log('方法一 - then:', data.title);
+});
 
-// 取得 async function 回傳值得方法
+// 方法二：使用 await（須在另一個 async function 中）
+(async () => {
+  const data = await asyncFn();
+  console.log('方法二 - await:', data.title);
+})();
 
-
-// #3 Async function 錯誤處理
-
+// #3 Async function 錯誤處理（使用 try...catch）
+const getDataWithError = async () => {
+  try {
+    const res = await axios.get('https://jsonplaceholder.typicode.com/todos/999999');
+    console.log('成功:', res.data);
+  } catch (err) {
+    console.log('錯誤捕捉:', err.message); // ✅ 捕捉錯誤
+  }
+}
+getDataWithError();
 
 
 // async Function 與 React

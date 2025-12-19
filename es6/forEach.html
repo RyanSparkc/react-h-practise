@@ -31,47 +31,56 @@ const people = [
 // #1. 更完整的陣列，也可參考此影片
 // https://www.youtube.com/watch?v=_vFuDQ_6Xt8
 
-// #2. 操作所有陣列內的值（同一個陣列）
+// #2. forEach：操作所有陣列內的值（不會回傳新陣列）
+people.forEach((person, index) => {
+  console.log(`${index + 1}. ${person.name} 喜歡 ${person.like}`);
+});
 
+// #3. map：重新建立新的陣列
+const names = people.map((person) => person.name); // ✅ 取出所有人名
+console.log(names); // ['卡斯伯', '小明', '漂亮阿姨', 'Ray']
 
-// #3. 重新建立新的陣列
+// filter：過濾陣列
+const cheapFood = people.filter((person) => person.price < 100); // ✅ 過濾價格小於 100 的
+console.log(cheapFood);
 
+// find：找到第一個符合條件的
+const foundPerson = people.find((person) => person.name === '小明');
+console.log(foundPerson); // { name: '小明', like: '牛肉麵', price: 120 }
 
 // #4 map 使用注意事項
-
 // 當直接回傳時，會出現 undefined 的內容
+const wrongMap = people.map((person) => {
+  if (person.price > 50) {
+    return person.name; // ❌ 沒有回傳值的項目會變成 undefined
+  }
+});
+console.log('錯誤示範:', wrongMap); // ['卡斯伯', '小明', undefined, '大麻醬乾麵']
 
-
-// 解法
+// ✅ 解法：先用 filter 過濾，再用 map 轉換
+const correctMap = people
+  .filter((person) => person.price > 50)
+  .map((person) => person.name);
+console.log('正確示範:', correctMap); // ['卡斯伯', '小明', 'Ray']
 
 
 // #5 map 在 React 中的運用
-const App = ()=> {
+const App = () => {
   const people = [
-    {
-      name: '卡斯伯',
-      like: '鍋燒意麵',
-      price: 80
-    },
-    {
-      name: '小明',
-      like: '牛肉麵',
-      price: 120
-    },
-    {
-      name: '漂亮阿姨',
-      like: '滷味切盤',
-      price: 40
-    },
-    {
-      name: 'Ray',
-      like: '大麻醬乾麵',
-      price: 60
-    }
+    { name: '卡斯伯', like: '鍋燒意麵', price: 80 },
+    { name: '小明', like: '牛肉麵', price: 120 },
+    { name: '漂亮阿姨', like: '滷味切盤', price: 40 },
+    { name: 'Ray', like: '大麻醬乾麵', price: 60 }
   ];
+
   return <div>
     <ul>
-      
+      {/* ✅ 使用 map 渲染列表，記得加上 key */}
+      {people.map((person) => (
+        <li key={person.name}>
+          {person.name} 喜歡 {person.like}，價格 ${person.price}
+        </li>
+      ))}
     </ul>
   </div>
 }

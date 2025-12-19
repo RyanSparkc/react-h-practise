@@ -7,19 +7,18 @@
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
 // #1 非同步的觀念
-// function getData() {
-//   setTimeout(() => {
-//     console.log('... 已取得遠端資料');
-//   }, 0);
-// }
-// // 請問取得資料的順序為何
-// function init() {
-//   console.log(1);
-//   getData();
-//   console.log(2);
-// }
-//
-// init();
+function getData() {
+  setTimeout(() => {
+    console.log('... 已取得遠端資料');
+  }, 0);
+}
+// 請問取得資料的順序為何
+function init() {
+  console.log(1);
+  getData();
+  console.log(2);
+}
+init(); // 輸出順序：1 → 2 → ... 已取得遠端資料
 
 // 更正確的說法，Promise 是為了解決傳統非同步語法難以建構及管理的問題，如有興趣可搜尋 "callback hell js"
 
@@ -37,21 +36,45 @@ const promiseSetTimeout = (status) => {
 }
 
 // #2-1 基礎運用
-
+promiseSetTimeout(true)
+  .then((res) => {
+    console.log('成功:', res); // ✅ 成功: promiseSetTimeout 成功
+  });
 
 // #2-2 串接
-
+promiseSetTimeout(true)
+  .then((res) => {
+    console.log('第一次:', res);
+    return promiseSetTimeout(true); // ✅ 回傳新的 Promise 來串接
+  })
+  .then((res) => {
+    console.log('第二次:', res);
+  });
 
 // #2-3 失敗捕捉
-
+promiseSetTimeout(false)
+  .then((res) => {
+    console.log('成功:', res);
+  })
+  .catch((err) => {
+    console.log('失敗:', err); // ✅ 失敗: promiseSetTimeout 失敗
+  });
 
 // #3 實戰取得遠端資料
-// #3-1
-// https://github.com/axios/axios
+// #3-1 使用 Axios
+axios.get('https://jsonplaceholder.typicode.com/todos/1')
+  .then((res) => {
+    console.log('Axios 取得資料:', res.data);
+  });
 
 // #3-2 記得捕捉錯誤，Axios 錯誤捕捉技巧
-// https://randomuser.me/
-
+axios.get('https://randomuser.me/api/')
+  .then((res) => {
+    console.log('Random User:', res.data.results[0].name);
+  })
+  .catch((err) => {
+    console.log('錯誤:', err.message); // ✅ 記得處理錯誤
+  });
 </script>
 <!-- 🙇🙇練習結束🙇🙇 -->
 </main>

@@ -7,14 +7,32 @@
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
 
-// #1 當資料有順序性的時候
+// #1 當資料有順序性的時候（使用 Promise 串接）
+axios.get('https://jsonplaceholder.typicode.com/todos/1')
+  .then((res) => {
+    console.log('第一筆:', res.data.title);
+    return axios.get('https://jsonplaceholder.typicode.com/todos/2');
+  })
+  .then((res) => {
+    console.log('第二筆:', res.data.title);
+  });
+
+// #2 使用 async await 來修改（更簡潔的寫法）
+const getData = async () => {
+  const res1 = await axios.get('https://jsonplaceholder.typicode.com/todos/1');
+  console.log('Async 第一筆:', res1.data.title);
+  
+  const res2 = await axios.get('https://jsonplaceholder.typicode.com/todos/2');
+  console.log('Async 第二筆:', res2.data.title);
+}
+getData();
 
 
-// #2 使用 async await 來修改
-
-
-
-// #3 立即函式的寫法
+// #3 立即函式的寫法（IIFE - Immediately Invoked Function Expression）
+(async () => {
+  const res = await axios.get('https://jsonplaceholder.typicode.com/todos/3');
+  console.log('立即函式取得:', res.data.title);
+})();
 
 
 

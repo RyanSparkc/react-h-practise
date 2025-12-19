@@ -35,30 +35,30 @@ console.log(obj.fn());
 
 // =====
 // #2 物件字面值 Object literals
-// #2-1 物件內的函式
-// const obj3 = {
-//   myName: '物件',
-//   fn: function() { // 請改為縮寫
-//     return this.myName;
-//   }
-// }
+// #2-1 物件內的函式（縮寫語法）
+const obj3 = {
+  myName: '物件',
+  fn() {  // ✅ 函式縮寫：省略 : function
+    return this.myName;
+  }
+}
 
-// console.log(obj3.fn());
+console.log(obj3.fn());
 
-// #2-2 物件內的變數
-// const person = {
-//   name: '小明'
-// };
+// #2-2 物件內的變數（屬性縮寫）
+const name = '小明';
+const person = {
+  name  // ✅ 當變數名稱與屬性名稱相同時，可以縮寫
+};
+console.log(person); // { name: '小明' }
 
 
-
-
-
-// #3 展開
+// #3 展開運算子 Spread Operator
 // #3-1 不同陣列合併
 const groupA = ['小明', '杰倫', '阿姨'];
 const groupB = ['老媽', '老爸'];
-
+const allGroup = [...groupA, ...groupB]; // ✅ 展開並合併陣列
+console.log(allGroup); // ['小明', '杰倫', '阿姨', '老媽', '老爸']
 
 // #3-2 物件擴展
 const methods = {
@@ -66,10 +66,16 @@ const methods = {
     console.log(1);
   },
   fn2() {
-    console.log(1);
+    console.log(2);
   },
 }
-
+const newObj = {
+  ...methods,  // ✅ 展開物件
+  fn3() {
+    console.log(3);
+  }
+};
+console.log(newObj);
 
 // #3-3 轉成純陣列
 // 補充說明：NodeList 或 HTMLCollection 或 Arguments 是「類陣列」的物件，可以運用本章節的展開技巧轉換為純陣列。
@@ -77,15 +83,16 @@ const methods = {
 // HTMLCollection: https://developer.mozilla.org/zh-TW/docs/Web/API/HTMLCollection
 // NodeList: https://developer.mozilla.org/zh-TW/docs/Web/API/NodeList
 const doms = document.querySelectorAll('li');
-console.log(doms); // 請轉為純陣列
+const domsArray = [...doms]; // ✅ 將 NodeList 轉為純陣列
+console.log(domsArray); // 現在可以使用陣列的所有方法，如 map, filter 等
 
 
-
-// #4 預設值
-// function sum(a, b) { // 請加入預設值避免錯誤
-//   return a + b;
-// }
-// console.log(sum(1));
+// #4 預設值 Default Parameters
+function sum(a, b = 0) { // ✅ 為參數加入預設值
+  return a + b;
+}
+console.log(sum(1)); // 1（b 使用預設值 0）
+console.log(sum(1, 2)); // 3
 </script>
 <!-- 🙇🙇練習結束🙇🙇 -->
 </main>

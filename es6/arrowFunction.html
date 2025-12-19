@@ -6,41 +6,51 @@
 <div id="root"></div>
 <script type="text/babel">
 // #1 箭頭函式改寫
+// 傳統函式
 function fn(a, b) {
   return a * b;
 }
 console.log(fn(2, 4));
 
+// ✅ 箭頭函式改寫
+const fnArrow = (a, b) => a * b; // 單行可省略 {} 和 return
+console.log(fnArrow(2, 4)); // 8
+
+// 更多箭頭函式範例
+const greet = name => `Hello, ${name}!`; // 單一參數可省略括號
+const getObj = () => ({ name: '小明' }); // 回傳物件需用括號包住
+
 
 // #2 箭頭函式的 this 變化（React Hook 寫法不太會踩到這個雷）
-// var name = '全域'
-// const person = {
-//   name: '小明',
-//   callName: function () { 
-//     console.log('1', this.name); // 1 小明
-//     setTimeout(function () {
-//       console.log('2', this.name); // 2
-//       console.log('3', this); // 3
-//     }, 10);
-//   },
-// }
-// person.callName();
+var myName = '全域'
+const personObj = {
+  myName: '小明',
+  callName: function () { 
+    console.log('1', this.myName); // 1 小明
+    setTimeout(() => {  // ✅ 箭頭函式不會創建自己的 this
+      console.log('2', this.myName); // 2 小明（繼承外層的 this）
+      console.log('3', this); // 3 personObj
+    }, 10);
+  },
+}
+personObj.callName();
 
 
 
 // #3 箭頭函式在 React 的運用
-function Card() {
+// ✅ 將傳統函式改為箭頭函式
+const Card = () => {
   return <div className="card">
     <div className="card-body">這是一張卡片</div>
   </div>
 }
-function App() {
-  return (
-    <div>
-      <Card></Card>
-    </div>
-  )
-}
+
+// ✅ 箭頭函式元件（更簡潔的寫法）
+const App = () => (
+  <div>
+    <Card></Card>
+  </div>
+)
 
 ReactDOM
   .createRoot(document.getElementById('root'))
