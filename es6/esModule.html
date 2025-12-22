@@ -4,7 +4,7 @@
 <!-- 章節標題 --><div class="mb-4"><h1 class="mt-0 text-muted">ES 模組</h1><small>檔名：<code>esModule.html</code></small></div>
 <!-- 🔥🔥練習開始🔥🔥 -->
 <div id="root"></div>
-<script>
+<script type="module">
 // 因為 type="text/babel" 與 type="module" 相衝，所以課程前期不會用到 ESModule 定義元件
 // #1 匯出匯入本一體，先掌握匯出更容易理解匯入
 // #1-1 將標籤定義 <script type="module">
@@ -41,6 +41,24 @@
 // sideEffect.js（沒有包含匯出的檔案）
 // 直接執行檔案內的程式碼，不需要接收任何值
 // import './sideEffect.js';  // ✅ 只執行，不匯入
+
+// ==================== 練習答案 ====================
+
+// #2-1 預設匯入：從 defaultExport.js 匯入
+import person from './defaultExport.js';
+console.log('預設匯入:', person);
+console.log(`姓名: ${person.name}, 年齡: ${person.age}`);
+person.sayHello();
+
+// #2-2 具名匯入：從 namedExport.js 匯入
+import { a, b, c } from './namedExport.js';
+console.log('具名匯入 - 變數 a:', a);
+b(); // 執行函式 b
+console.log('具名匯入 - 函式 c(2, 3):', c(2, 3));
+
+// #3 SideEffect 匯入：直接執行 sideEffect.js
+import './sideEffect.js';
+console.log('SideEffect 結果 - window.$:', window.$);
 
 console.log('ES Module 範例說明 - 請查看程式碼註解');
 </script>
