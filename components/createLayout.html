@@ -6,10 +6,63 @@
 
 <div id="root"></div>
 <script type="text/babel">
+  // 🎯 拆出 PricingCard 元件 - 因為三張卡片結構重複，只有資料不同
+  const PricingCard = ({ title, price, description, buttonText }) => {
+    return (
+      <div className="card mb-4">
+        <div className="card-header">
+          <h4 className="my-0">{title}</h4>
+        </div>
+        <div className="card-body">
+          <h1 className="card-title">
+            {/* 🔥 三元運算子：判斷是否為數字，是數字加上 $ 符號 */}
+            {typeof price === 'number' ? (
+              <>$ {price}<small>/月</small></>
+            ) : (
+              price
+            )}
+          </h1>
+          <p>{description}</p>
+          <button type="button" className="btn btn-outline-primary">
+            {buttonText}
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   // 不要直接寫一個過大的應用，先從「運用元件開始」
   const App = () => {
     return (
       <>
+        {/* ❌ 不需要拆元件：標題只出現一次 */}
+        <h2>月月送菜到你家</h2>
+        <p>
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. Tempore molestiae
+          facere asperiores sit aspernatur laboriosam ipsum, excepturi fuga,
+          consequuntur cupiditate, nam a doloremque error adipisci nulla reiciendis
+          itaque odio voluptatibus.
+        </p>
+
+        {/* ✅ 使用 PricingCard 元件，傳入不同資料 */}
+        <PricingCard
+          title="基本版"
+          price={1000}  // 傳入數字，元件會自動加上 $
+          description="基本每週配給，包含高麗菜、空心菜，健康不馬乎"
+          buttonText="免費試用"
+        />
+        <PricingCard
+          title="進階版"
+          price={6000}  // 傳入數字，元件會自動加上 $
+          description="奶蛋魚肉經營養師精確估計，適合三人小家庭使用，每週一、四配送"
+          buttonText="永保健康"
+        />
+        <PricingCard
+          title="企業版"
+          price="請洽客服"  // 傳入字串，直接顯示
+          description="多少人數均可訂製，5 ~ 1000 人團體均適用"
+          buttonText="大吃大喝方案"
+        />
       </>
     );
   };

@@ -7,9 +7,46 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
 <script type="text/babel">
   const App = () => {
+    // 準備圖表資料
+    const chartData = [
+      { label: '小明', value: 1000 },
+      { label: '杰倫', value: 10000 },
+      { label: '漂亮阿姨', value: 3000 },
+      { label: '卡斯伯', value: 2500 },
+    ];
+
+    // 準備側邊欄資料
+    const menuList = ['首頁', '關於我們', '產品列表', '聯絡我們'];
+
     return (
       <>
-        React
+        {/* 1️⃣ 渲染 Header 元件，傳入圖片網址 */}
+        <Header imgUrl="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=1200" />
+
+        <div className="row">
+          {/* 4️⃣ 側邊欄區域 */}
+          <div className="col-md-4">
+            <h5>導覽選單</h5>
+            {/* 渲染 Sidebar 元件，傳入自訂選單 */}
+            <Sidebar list={menuList} />
+          </div>
+
+          {/* 2️⃣ 主要內容區 */}
+          <div className="col-md-8">
+            <h2>歡迎來到 React 世界！</h2>
+            <p>這是一個展示如何渲染元件的範例</p>
+            
+            {/* 3️⃣ 渲染 ChartJs 元件，傳入資料和標題 */}
+            <ChartJs data={chartData} title="銷售業績" type="bar" />
+          </div>
+
+        </div>
+
+        {/* 5️⃣ 渲染 Footer 元件，使用 children */}
+        <Footer>
+          <p>© 2024 六角學院 React 課程</p>
+          <small>這段文字是透過 children 傳入的</small>
+        </Footer>
       </>
     );
   };

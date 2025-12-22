@@ -5,21 +5,66 @@
 <!-- 🔥🔥練習開始🔥🔥 -->
 <div id="root"></div>
 <script type="text/babel">
-  const Card = ({title, price, content, callToAction}) => {
-    return (<div className="card mb-4">
-      <div className="card-header">
-        <h4 className="my-0">{title}</h4>
+  // 🆕 Button 元件 - 根據 variant 顯示不同樣式
+  const Button = ({ children, variant = 'primary' }) => {
+    // variant: 'primary' | 'outline'
+    const className = variant === 'outline' 
+      ? 'btn btn-outline-primary' 
+      : 'btn btn-primary';
+    
+    return (
+      <button type="button" className={className}>
+        {children}
+      </button>
+    );
+  };
+
+  // Card 元件 - 新增 isPrimary 和 hasIcon prop
+  const Card = ({ title, price, content, callToAction, isPrimary = false, hasIcon = false }) => {
+    return (
+      <div className="card mb-4">
+        <div className="card-header">
+          <h4 className="my-0">{title}</h4>
+        </div>
+        <div className="card-body">
+          <h1 className="card-title">{typeof price === 'number' ? `$${price}` : price}</h1>
+          <p>{content}</p>
+          {/* 🔥 根據 isPrimary 條件顯示不同樣式的按鈕 */}
+          <Button variant={isPrimary ? 'primary' : 'outline'}>
+            {/* 💎 根據 hasIcon 決定是否顯示圖標 */}
+            {hasIcon && <i className="bi bi-gem"></i>}
+            {hasIcon ? ` ${callToAction} ` : callToAction}
+            {hasIcon && <i className="bi bi-gem"></i>}
+          </Button>
+        </div>
       </div>
-      <div className="card-body">
-        <h1 className="card-title">{typeof price === 'number' ? `$${price}` : price }</h1>
-        <p>{content}</p>
-        <button type="button" className="btn btn-outline-primary">{callToAction}</button>
-      </div>
-    </div>)
+    );
   }
 
 
 
+  // 🆕 CardList 巢狀元件 - 內部使用了 Card 元件
+  const CardList = ({ products }) => {
+    return (
+      <>
+        <h2>月月送菜到你家</h2>
+        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Tempore molestiae facere asperiores sit aspernatur laboriosam ipsum, excepturi fuga, consequuntur cupiditate, nam a doloremque error adipisci nulla reiciendis itaque odio voluptatibus.</p>
+        {products.map((product) => (
+          <Card
+            key={product.id}
+            title={product.title}
+            price={product.price}
+            content={product.content}
+            callToAction={product.callToAction}
+            isPrimary={product.isPrimary}
+            hasIcon={product.hasIcon}  // 🔥 傳遞 hasIcon
+          />
+        ))}
+      </>
+    );
+  };
+
+  // App 變得更簡潔！只負責管理資料
   const App = () => {
     const products = [
       {
@@ -41,20 +86,14 @@
         title: '企業版',
         price: '請洽客服',
         content: '多少人數均可訂製，5 ~ 1000 人團體均適用',
-        callToAction: '大吃大喝方案'
+        callToAction: '大吃大喝方案',  // ✅ 純字串
+        isPrimary: true,
+        hasIcon: true,  // 🔥 用旗標控制圖標顯示
       },
-    ]
-    return (
-      <>
-        <h2>月月送菜到你家</h2>
-        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Tempore molestiae facere asperiores sit aspernatur laboriosam ipsum, excepturi fuga, consequuntur cupiditate, nam a doloremque error adipisci nulla reiciendis itaque odio voluptatibus.</p>
-        {
-          products.map((product) => {
-            return <Card  key={product.id} title={product.title} price={product.price} content={product.content} callToAction={product.callToAction}></Card>
-          })
-        }
-      </>
-    )
+    ];
+
+    // ✅ App 只需要傳入資料，渲染邏輯交給 CardList
+    return <CardList products={products} />;
   }
   
   ReactDOM.createRoot(document.getElementById('root'))
