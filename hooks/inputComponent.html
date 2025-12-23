@@ -6,10 +6,71 @@
 <!--  -->
 <div id="root"></div>
 <script type="text/babel">
+const { useState } = React;
+
+// 可重用的 Input 元件
+const Input = ({ id, label, value, onChange }) => {
+  return (
+    <div style={{ marginBottom: '10px' }}>
+      <label htmlFor={id}>{label}</label>
+      <input 
+        id={id}
+        type="text" 
+        value={value} 
+        onChange={onChange}
+        style={{ marginLeft: '10px' }}
+      />
+    </div>
+  );
+};
 
 const App = () => {
+  // 分別管理不同欄位的狀態
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+
+  // 定義具名的 handler 函式
+  const handleNameChange = (e) => {
+    setName(e.target.value);
+  };
+
+  const handleEmailChange = (e) => {
+    setEmail(e.target.value);
+  };
+
+  const handlePhoneChange = (e) => {
+    setPhone(e.target.value);
+  };
+
   return (<div>
+    <h2>表單輸入</h2>
     
+    {/* 使用 Input 元件，傳入具名函式 */}
+    <Input 
+      id="name"
+      label="姓名：" 
+      value={name} 
+      onChange={handleNameChange} 
+    />
+    <Input 
+      id="email"
+      label="Email：" 
+      value={email} 
+      onChange={handleEmailChange} 
+    />
+    <Input 
+      id="phone"
+      label="電話：" 
+      value={phone} 
+      onChange={handlePhoneChange} 
+    />
+
+    <hr />
+    <h3>輸入結果：</h3>
+    <p>姓名：{name}</p>
+    <p>Email：{email}</p>
+    <p>電話：{phone}</p>
   </div>)
 }
 

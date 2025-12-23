@@ -6,23 +6,46 @@
 <div id="root"></div>
 <script type="text/babel">
 // #1 useState 的方法在哪裡？
+// 答：useState 是 React 提供的 Hook，存在於 React 物件中
+const { useState } = React;
 
 // #2 useState 僅能在 Component 內運作
-
+// ❌ 錯誤示範：不能在元件外使用 useState
+// const [wrong, setWrong] = useState('這會報錯');
 
 // #3 state 是 ReadOnly
 // #3-1 為了讓 React 知道資料已更新，所以會使用另一個方法進行觸發
 const App = () => {
   // #3-2 這影響了許多會操作原始值的方法
+  const [count, setCount] = useState(0);
+  const [items, setItems] = useState(['蘋果', '香蕉']);
+
+  // ❌ 錯誤：直接修改 state（React 不會偵測到變化）
+  // count = 10;
+  // items.push('橘子');
+
+  // ✅ 正確：使用 setter 函式更新
+  const addItem = () => {
+    // 使用展開運算子建立新陣列，而非直接 push
+    setItems([...items, '橘子']);
+  };
+
+  console.log('App 元件被重新執行了！'); // #4 驗證用
 
   return (<div>
+    <h2>計數：{count}</h2>
+    <button onClick={() => setCount(count + 1)}>+1</button>
     
+    <h2>水果清單：</h2>
+    <ul>
+      {items.map((item, index) => <li key={index}>{item}</li>)}
+    </ul>
+    <button onClick={addItem}>新增橘子</button>
   </div>)
 }
 
-
-
 // #4 state 觸發時，會完整更新 function
+// 每次 state 改變，整個 App 函式都會重新執行一次
 
 ReactDOM.createRoot(document.querySelector('#root'))
   .render(<App/>)

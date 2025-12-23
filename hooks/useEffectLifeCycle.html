@@ -29,25 +29,60 @@ const App = () => {
   }
 
   // #1 useEffect 的觸發時間點
-  // 當都不加入任何條件時
+  
+  // 情況一：不加入依賴陣列 → 每次渲染都執行
+  useEffect(() => {
+    console.log('🔴 每次渲染都會執行');
+  });
 
+  // 情況二：只有空陣列 → 只執行一次（首次渲染後）
+  useEffect(() => {
+    console.log('🟢 只執行一次（類似 componentDidMount）');
+  }, []);
 
-  // 只有加入一個空陣列
-
-
-  // 加入 state 作為條件
-
+  // 情況三：加入 state 作為依賴 → 該 state 改變時執行
+  useEffect(() => {
+    console.log('🔵 filterString 改變時執行:', filterString);
+  }, [filterString]);
 
   // #2 useEffect 的限制，不可在 if 內使用
-
+  // ❌ 錯誤示範（違反 Hooks 規則）
+  // if (filterString.length > 3) {
+  //   useEffect(() => {
+  //     console.log('這會報錯！');
+  //   }, []);
+  // }
+  // ✅ 正確做法：把條件放在 useEffect 內部
+  useEffect(() => {
+    if (filterString.length > 3) {
+      console.log('🟡 filterString 長度超過 3:', filterString);
+    }
+  }, [filterString]);
 
   // #3 非同步
-  // useEffect callback 本身不能作為 async function 使用
+  // ❌ useEffect callback 本身不能作為 async function 使用
+  // useEffect(async () => {
+  //   const data = await fetch(url);  // 這樣會報錯！
+  // }, []);
 
+  // ✅ 正確做法：在 useEffect 內部定義 async 函式
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const result = await axios.get(`${api}?client_id=${accessKey}&query=${filterString}`);
+        console.log('🟣 API 資料:', result.data.results.length, '筆');
+      } catch (error) {
+        console.log('錯誤:', error);
+      }
+    };
+    fetchData();
+  }, [filterString]);
   
   return (<div>
-    {console.log(2)}
+    {console.log('JSX 渲染')}
     <SearchBox onSearchHandler={onSearchHandler} filterString={filterString} />
+    <p className="mt-3">目前搜尋：{filterString}</p>
+    <p className="text-muted">打開 Console 查看 useEffect 執行順序</p>
   </div>)
 }
 

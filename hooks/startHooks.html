@@ -6,11 +6,16 @@
 <div id="root"></div>
 <script type="text/babel">
 // #1 取出 useState 的方法
+const { useState } = React;
 
 const App = () => {
   // #2 定義狀態
+  const [count, setCount] = useState(0);
+
   return (<div>
+    <h2>目前計數：{count}</h2>
     {/* 使用 set 將值寫入 */}
+    <button onClick={() => setCount(count + 1)}>點擊 +1</button>
     </div>)
 }
 

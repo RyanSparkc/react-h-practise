@@ -15,24 +15,53 @@
 <!--  -->
 <div id="root"></div>
 <script type="text/babel">
-const { useState, useEffect } = React;
+const { useState, useEffect, useRef } = React;
 
 
 const App = () => {
+  // 用 useRef 保存 Modal 實體，讓它在重新渲染後仍然存在
+  const modalRef = useRef(null);
+
   // #1 在 React 中套用 Bootstrap 語法
   // #1-1 錯誤寫法（DOM 尚未生成）
+  // ❌ 這樣會報錯，因為 DOM 還沒渲染
+  // const modal = new bootstrap.Modal(document.querySelector('#newModal'));
 
-  // #1-2 DOM 已經生成
+  // #1-2 DOM 已經生成（使用 useEffect）
+  useEffect(() => {
+    // ✅ 在 useEffect 中建立實體，確保 DOM 已渲染
+    modalRef.current = new bootstrap.Modal(document.querySelector('#newModal'));
+    
+    // #3 套用監聽（選擇性）
+    const modalElement = document.querySelector('#newModal');
+    modalElement.addEventListener('shown.bs.modal', () => {
+      console.log('Modal 已打開');
+    });
+    modalElement.addEventListener('hidden.bs.modal', () => {
+      console.log('Modal 已關閉');
+    });
 
+    // 清理函式
+    return () => {
+      modalRef.current?.dispose();
+    };
+  }, []);
 
-  // #2 錯誤寫法
-  // 2-1 作用域錯誤
+  // #2 操作 Modal
+  // 2-1 正確寫法：使用 useRef 保存的實體
+  const openModal = () => {
+    modalRef.current?.show();
+  };
 
-  // 2-2 操作
+  // 2-2 錯誤寫法示範（作用域錯誤）
+  // ❌ 如果在這裡寫 const modal = new bootstrap.Modal(...)
+  // 每次渲染都會建立新實體，而且可能 DOM 還沒準備好
 
   return (
     <>
-      <button type="button" className="btn btn-primary" >打開 Modal</button>
+      <button type="button" className="btn btn-primary" onClick={openModal}>
+        打開 Modal
+      </button>
       <div className="modal fade" tabIndex="-1" id="newModal">
         <div className="modal-dialog">
           <div className="modal-content">

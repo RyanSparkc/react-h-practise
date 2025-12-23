@@ -22,10 +22,27 @@ const App = () => {
   }
 
   // #5-1 如果有非同步、週期式事件可能會重複性觸發
+  // ❌ 錯誤示範：不要這樣寫！會造成無限迴圈
+  // setArr([...arr, 4]); // 直接在元件內呼叫 setState 會無限觸發重新渲染
   
+  // ❌ 錯誤示範：setInterval 沒有正確清理會重複觸發
+  // setInterval(() => {
+  //   setArr(prev => [...prev, prev.length + 1]);
+  // }, 1000);
 
+  // ✅ 正確做法：使用 useEffect 並清理
+  // useEffect(() => {
+  //   const timer = setInterval(() => {
+  //     setArr(prev => [...prev, prev.length + 1]);
+  //   }, 1000);
+  //   return () => clearInterval(timer); // 清理函式
+  // }, []);
 
-  // #5-2 請確保 setState 是放在元件最外層
+  // #5-2 請確保 setState 是放在元件最外層（函式頂層）
+  // ❌ 錯誤：在條件式或迴圈中使用 useState
+  // if (arr.length > 5) {
+  //   const [extra, setExtra] = useState('');  // 違反 Hooks 規則
+  // }
 
   return (<div>
     <ul>

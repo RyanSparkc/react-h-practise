@@ -9,7 +9,21 @@
 <script type="text/babel">
 const { useState, useEffect } = React;
 const api = 'https://api.unsplash.com/search/photos/';
-const accessKey = 'GAvxZ9VesndxTx_9NftqgOtZffnTB0YhfGiWGDJA-bs';
+const accessKey = '';
+
+// Card 元件：顯示圖片
+const Card = ({ item }) => {
+  return (
+    <div className="card">
+      <img 
+        className="card-img" 
+        src={`${item.urls.raw}&w=400&q=80`} 
+        alt={item.alt_description || '圖片'}
+        style={{ width: '100%', height: '200px', objectFit: 'cover' }}
+      />
+    </div>
+  );
+};
 
 const SearchBox = ({onSearchHandler, filterString}) => {
   return <div>
@@ -20,21 +34,49 @@ const SearchBox = ({onSearchHandler, filterString}) => {
     />
   </div>
 }
+
 const App = () => {
-  console.log(1);
+  console.log('App 渲染');
   const [filterString, setFilterString] = useState('animal');
+  const [jsonData, setJsonData] = useState([]);  // 儲存圖片資料
 
   const onSearchHandler = (e) => {
     setFilterString(e.target.value);
   }
 
   // #1 建立非同步方法時，會因為渲染的關係不斷重複觸發
+  const getPhotos = async () => {
+    try {
+      const result = await axios.get(
+        `${api}?client_id=${accessKey}&query=${filterString}`
+      );
+      console.log('API 回傳:', result.data.results);
+      setJsonData(result.data.results);
+    } catch (error) {
+      console.log('錯誤:', error);
+    }
+  };
 
-  // #2 useEffect
+  // ❌ 錯誤示範：直接呼叫會造成無限迴圈
+  // getPhotos(); // setState → 重新渲染 → 又呼叫 getPhotos → 無限循環！
+
+  // #2 useEffect 正確做法
+  useEffect(() => {
+    console.log('useEffect 執行，filterString:', filterString);
+    getPhotos();
+  }, [filterString]);  // 當 filterString 改變時才重新呼叫
 
   return (<div>
-    {console.log(2)}
+    {console.log('JSX 渲染')}
     <SearchBox onSearchHandler={onSearchHandler} filterString={filterString} />
+    
+    <div className="row row-cols-2 row-cols-md-3 g-3 mt-3">
+      {jsonData.map((item) => (
+        <div className="col" key={item.id}>
+          <Card item={item} />
+        </div>
+      ))}
+    </div>
   </div>)
 }
 

@@ -20,38 +20,91 @@ const Card = ({item}) => {
 
 const SearchBox = ({onSearchHandler, filterString}) => {
   return <div>
-    <label htmlFor="filter">搜尋</label>
+    <label htmlFor="filter">搜尋（按 Enter 搜尋）</label>
     <input type="text" id="filter" className="form-control"
-      value={filterString}
-      onChange={onSearchHandler}
+      defaultValue={filterString}
+      onKeyPress={onSearchHandler}
     />
   </div>
 }
 
-let currentPage = 1;
 const App = () => {
   const [filterString, setFilterString] = useState('animal');
   const [jsonData, setJsonData] = useState([]);
+  const isLoading = useRef(false);  // 防止重複載入
+  const currentPage = useRef(1);    // 當前頁數
+  const listRef = useRef(null);     // 列表容器 ref
+
   const onSearchHandler = (e) => {
-    setFilterString(e.target.value);
+    if (e.key === 'Enter') {
+      setFilterString(e.target.value);
+    }
   }
 
+  // 取得圖片資料
+  const getPhotos = async (page = 1, isNew = true) => {
+    try {
+      isLoading.current = true;
+      console.log(`載入第 ${page} 頁...`);
+      
+      const result = await axios.get(`${api}?client_id=${accessKey}&query=${filterString}&page=${page}`);
+      console.log('取得資料:', result.data.results.length, '筆');
+      
+      setJsonData((prev) => {
+        if (isNew) {
+          return result.data.results;  // 新搜尋：取代舊資料
+        }
+        return [...prev, ...result.data.results];  // 滾動載入：合併資料
+      });
+      
+      currentPage.current = page;
+      
+      // 延遲解除 loading 狀態，避免連續觸發
+      setTimeout(() => {
+        isLoading.current = false;
+      }, 1000);
+    } catch (error) {
+      console.log('錯誤:', error);
+      isLoading.current = false;
+    }
+  };
+
   useEffect(() => {
-    (async () => {
-      try {
-        // 搜尋特定需要加入 query
-        const result = await axios.get(`${api}?client_id=${accessKey}&query=${filterString}`);
-        console.log(result);
-        setJsonData(result.data.results);
-      } catch (error) {
-        console.log(error);
+    // 初始載入
+    getPhotos(1, true);
+    currentPage.current = 1;
+
+    // 滾動事件處理函式
+    const scrollHandler = () => {
+      if (!listRef.current) return;
+      
+      const listHeight = listRef.current.offsetHeight + listRef.current.offsetTop;
+      const scrollPosition = window.scrollY + window.innerHeight;
+      
+      console.log('滾動位置:', window.scrollY);
+      
+      // 當滾動到接近底部且沒有在載入中
+      if (!isLoading.current && scrollPosition > listHeight - 100) {
+        currentPage.current += 1;
+        getPhotos(currentPage.current, false);
       }
-    })();
-  }, [])
+    };
+
+    // 加入滾動監聽
+    window.addEventListener('scroll', scrollHandler);
+    console.log('✅ 已加入滾動監聽');
+
+    // 🔥 重要：清理函式 - 移除監聽！
+    return () => {
+      window.removeEventListener('scroll', scrollHandler);
+      console.log('❌ 已移除滾動監聽');
+    };
+  }, [filterString]);  // filterString 改變時重新執行
   
   return (<div>
     <SearchBox onSearchHandler={onSearchHandler} filterString={filterString} />
-    <div className='row row-cols-2 g-3'>
+    <p className="text-muted mt-2">滾動到底部會自動載入更多圖片</p>
+    <div className='row row-cols-2 g-3' ref={listRef}>
       { jsonData.map((item) => 
         <div className="col" key={item.id}>
           <Card item={item} />

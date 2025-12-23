@@ -6,10 +6,16 @@
 <div id="root"></div>
 <script type="text/babel">
 const App = () => {
-  const text = useState('這是一段文字')
+  // 使用解構取出 text（狀態值）和 setText（設定函式）
+  const [text, setText] = React.useState('這是一段文字');
   
   return (<div>
-    <input type="text" />
+    <p>目前輸入的內容：{text}</p>
+    <input 
+      type="text" 
+      value={text} 
+      onChange={(e) => setText(e.target.value)} 
+    />
   </div>)
 }
 

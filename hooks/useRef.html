@@ -8,6 +8,8 @@
 </div>
 <script>
 // #1 原生 JS 查看 DOM 元素
+const btn = document.querySelector('#btn');
+console.log('原生 JS 取得按鈕:', btn);
 </script>
 <!--  -->
 <div id="root"></div>
@@ -15,15 +17,55 @@
 const { useState, useEffect, useRef } = React;
 
 const App = () => {
-  // #2 使用 useRef
+  // #2 使用 useRef 取得 DOM 元素
+  const inputRef = useRef(null);  // 建立 ref
+  const modalRef = useRef(null);  // 用來存放 Modal DOM 元素
+  const modalInstanceRef = useRef(null);  // 用來存放 Bootstrap Modal 實體
 
-  // 3 操作 Bootstrap 改為使用 ref
+  // 聚焦輸入框的函式
+  const focusInput = () => {
+    inputRef.current.focus();  // 透過 .current 取得 DOM 並操作
+    console.log('inputRef.current:', inputRef.current);
+  };
 
+  // #3 操作 Bootstrap 改為使用 ref
+  useEffect(() => {
+    // 使用 ref 取得 Modal DOM，建立 Bootstrap 實體
+    if (modalRef.current) {
+      modalInstanceRef.current = new bootstrap.Modal(modalRef.current);
+    }
+    
+    // 清理函式
+    return () => {
+      modalInstanceRef.current?.dispose();
+    };
+  }, []);
+
+  const openModal = () => {
+    modalInstanceRef.current?.show();
+  };
 
   return (
     <>
-      <button type="button" className="btn btn-primary">打開 Modal</button>
-      <div className="modal fade" tabIndex="-1">
+      {/* #2 使用 ref 屬性綁定 DOM */}
+      <div className="mb-3">
+        <h5>useRef 取得 DOM 範例：</h5>
+        <input ref={inputRef} type="text" className="form-control" placeholder="點按鈕聚焦到這裡" />
+        <button type="button" className="btn btn-secondary mt-2" onClick={focusInput}>
+          聚焦輸入框
+        </button>
+      </div>
+
+      <hr />
+
+      {/* #3 使用 ref 操作 Bootstrap Modal */}
+      <h5>useRef 操作 Bootstrap Modal：</h5>
+      <button type="button" className="btn btn-primary" onClick={openModal}>
+        打開 Modal
+      </button>
+      
+      {/* 使用 ref 而非 id 來綁定 Modal */}
+      <div className="modal fade" tabIndex="-1" ref={modalRef}>
         <div className="modal-dialog">
           <div className="modal-content">
             <div className="modal-header">

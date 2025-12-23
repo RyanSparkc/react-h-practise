@@ -12,13 +12,53 @@ const App = () => {
   // #6 關於前一個狀態
   const [arr, setArr] = useState([]);
 
+  // 新增陣列資料的函式
+  const addHandler = () => {
+    // ❌ 錯誤寫法：如果快速連點，可能會使用到舊的 arr 值
+    // setArr([...arr, { num: arr.length + 1 }]);
+
+    // ✅ 正確寫法：使用 callback 函式取得「前一個狀態」
+    setArr((prev) => {
+      console.log('前一個狀態長度:', prev.length);
+      return [...prev, { num: prev.length + 1 }];
+    });
+  };
+
+  // 示範錯誤寫法的問題
+  const wrongAddHandler = () => {
+    // 連續呼叫兩次，但都是用同一個 arr 值
+    setArr([...arr, { num: arr.length + 1 }]);
+    setArr([...arr, { num: arr.length + 1 }]);
+    // 結果：只會新增一個，因為兩次都是用舊的 arr
+  };
+
+  // 正確的連續呼叫
+  const correctAddHandler = () => {
+    // 使用 callback，每次都能取得最新的 prev
+    setArr((prev) => [...prev, { num: prev.length + 1 }]);
+    setArr((prev) => [...prev, { num: prev.length + 1 }]);
+    // 結果：會正確新增兩個
+  };
 
   return (<div>
-    
+    <h4>陣列內容：</h4>
     <ul>
       {arr.map((item, key) => <li key={key}>{ item.num }</li>)}
     </ul>
-    <button type="button" >新增一組陣列及合併</button>
+    
+    <div className="d-flex gap-2">
+      <button type="button" className="btn btn-primary" onClick={addHandler}>
+        新增一個（正確）
+      </button>
+      <button type="button" className="btn btn-warning" onClick={wrongAddHandler}>
+        連續新增兩個（錯誤示範）
+      </button>
+      <button type="button" className="btn btn-success" onClick={correctAddHandler}>
+        連續新增兩個（正確）
+      </button>
+    </div>
+    
+    <p className="mt-3 text-muted">打開 Console 查看 prev 值</p>
   </div>)
 }
 
