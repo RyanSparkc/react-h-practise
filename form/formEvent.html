@@ -6,33 +6,84 @@
 <div id="root"></div>
 <script type="text/babel">
   const { useState } = React
+
   const App = () => {
     const [search, setSearch] = useState('');
 
-    // 使用 form submit 送出
+    // ==================== 方法一：使用 form submit 送出 ====================
+    // 當表單送出時（點按鈕或在 input 內按 Enter）
+    const handleSubmit = (e) => {
+      e.preventDefault();  // 阻止頁面重整
+      if (search.trim() === '') {
+        alert('請輸入搜尋內容！');
+        return;
+      }
+      alert(`🔍 使用 Form Submit 搜尋：${search}`);
+      console.log('Form Submit 搜尋:', search);
+    };
 
-
-    // Enter custom submit
-
-
+    // ==================== 方法二：Enter 自訂送出 ====================
+    // 監聽鍵盤事件，按下 Enter 時送出
+    const handleKeyDown = (e) => {
+      // e.key 是按下的按鍵名稱
+      if (e.key === 'Enter') {
+        if (search.trim() === '') {
+          alert('請輸入搜尋內容！');
+          return;
+        }
+        alert(`🔍 使用 Enter 鍵搜尋：${search}`);
+        console.log('Enter 鍵搜尋:', search);
+      }
+    };
     
   
-    return (<div>
-      <form>
-        <div className="mb-3">
-          <label htmlFor="search2" className="form-label">搜尋</label>
-          <input id="search2" type="search" className="form-control" name="search"
-          onChange={(e) => setSearch(e.target.value)}
-          value={search} />
+    return (
+      <div>
+        {/* ===== 方法一：Form Submit ===== */}
+        <div className="mb-4 p-3 border rounded">
+          <h5>方法一：Form Submit</h5>
+          <p className="text-muted small">在 form 內的 input 按 Enter 或點按鈕都會觸發 onSubmit</p>
+          <form onSubmit={handleSubmit}>
+            <div className="mb-3">
+              <label htmlFor="search2" className="form-label">搜尋</label>
+              <input
+                id="search2"
+                type="search"
+                className="form-control"
+                name="search"
+                placeholder="輸入後按 Enter 或點按鈕"
+                onChange={(e) => setSearch(e.target.value)}
+                value={search}
+              />
+            </div>
+            <button type="submit" className="btn btn-primary">搜尋</button>
+          </form>
         </div>
-      </form>
 
-      <label htmlFor="search1" className="form-label">搜尋</label>
-      {/* https://reactjs.org/docs/events.html#keyboard-events */}
-      <input id="search1" type="search" className="form-control" name="search"
-      value={search}
-      onChange={(e) => setSearch(e.target.value)} />
-    </div>)
+        {/* ===== 方法二：onKeyDown 監聽 Enter ===== */}
+        <div className="mb-4 p-3 border rounded">
+          <h5>方法二：監聽 Enter 鍵</h5>
+          <p className="text-muted small">不在 form 內的 input，用 onKeyDown 監聽 Enter 鍵</p>
+          <label htmlFor="search1" className="form-label">搜尋</label>
+          {/* https://reactjs.org/docs/events.html#keyboard-events */}
+          <input
+            id="search1"
+            type="search"
+            className="form-control"
+            name="search"
+            placeholder="輸入後按 Enter"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={handleKeyDown}  // 👈 監聽鍵盤事件
+          />
+        </div>
+
+        {/* 顯示目前輸入內容 */}
+        <div className="p-3 bg-light rounded">
+          <p className="mb-0">目前搜尋內容：<strong>{search || '（尚未輸入）'}</strong></p>
+        </div>
+      </div>
+    );
   }
   
   ReactDOM.createRoot(document.querySelector('#root'))

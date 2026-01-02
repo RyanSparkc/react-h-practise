@@ -10,123 +10,176 @@
   const { useState, useEffect } = React;
   const { useForm, useWatch } = ReactHookForm;
 
+  // ==================== 元件化：Input 元件 ====================
+  // 把重複的 input 結構抽成可重用的元件
+  const Input = ({ 
+    id, 
+    label, 
+    type = 'text',
+    placeholder = '',
+    register,      // 從父元件傳入
+    name,          // 欄位名稱
+    rules = {},    // 驗證規則
+    errors,        // 從父元件傳入
+  }) => {
+    // 取得該欄位的錯誤
+    const fieldError = errors[name];
+
+    return (
+      <div className='mb-3'>
+        <label htmlFor={id} className='form-label'>
+          {label} {rules.required && <span className="text-danger">*</span>}
+        </label>
+        <input
+          id={id}
+          type={type}
+          placeholder={placeholder}
+          {...register(name, rules)}
+          className={`form-control ${fieldError ? 'is-invalid' : ''}`}
+        />
+        {fieldError && (
+          <div className='invalid-feedback'>{fieldError.message}</div>
+        )}
+      </div>
+    );
+  };
+
+  // ==================== 元件化：Checkbox 群組元件 ====================
+  const CheckboxGroup = ({
+    label,
+    name,
+    options,       // [{ id, value, label }]
+    register,
+    rules = {},
+    errors,
+  }) => {
+    const fieldError = errors[name];
+
+    return (
+      <div className="mb-3">
+        <label className="form-label d-block">
+          {label} {rules.required && <span className="text-danger">*</span>}
+        </label>
+        {options.map((option, index) => (
+          <div className="form-check" key={option.id}>
+            <input
+              id={option.id}
+              type="checkbox"
+              className={`form-check-input ${fieldError ? 'is-invalid' : ''}`}
+              {...register(name, index === 0 ? rules : {})}
+              value={option.value}
+            />
+            <label className='form-check-label' htmlFor={option.id}>
+              {option.label}
+            </label>
+          </div>
+        ))}
+        {fieldError && (
+          <div className='text-danger small'>{fieldError.message}</div>
+        )}
+      </div>
+    );
+  };
+
+  // ==================== 主要 App 元件 ====================
   const App = () => {
     const {
       register,
       handleSubmit,
-      watch,
-      getValues,
-      control,
       formState: { errors },
     } = useForm({
       defaultValues: {
         username: '卡斯伯',
+        email: '',
+        tel: '',
         like: []
       },
-      // 錯誤驗證時機
       mode: 'onTouched',
     });
+
     const onSubmit = (data) => {
-      console.log(data);
+      console.log('表單送出：', data);
+      alert('註冊成功！');
     };
+
+    // 食物選項資料
+    const foodOptions = [
+      { id: 'checkList1', value: '炒麵', label: '炒麵' },
+      { id: 'checkList2', value: '鍋燒意麵', label: '鍋燒意麵' },
+      { id: 'checkList3', value: '炸薯條', label: '炸薯條' },
+    ];
 
     return (
       <div>
-        <form action='' onSubmit={handleSubmit(onSubmit)}>
-          <div className='mb-3'>
-            <label htmlFor='username' className='form-label'>
-              使用者名稱
-            </label>
-            <input
-              id='username'
-              type='text'
-              {...register('username', { required: {
-                value: true,
-                message: '使用者名稱為必填'
-              } })}
-              className={`form-control ${errors.username && 'is-invalid'}`}
-            />
-            {errors.username && (
-              <div className='invalid-feedback'>{errors?.username?.message}</div>
-            )}
-          </div>
-          <div className='mb-3'>
-            <label htmlFor='email' className='form-label'>
-              Email
-            </label>
-            <input
-              id='email'
-              type='text'
-              {...register('email', {
-                required: {
-                  value: true,
-                  message: 'Email 為必填'
-                },
-                pattern: {
-                  value: /^\S+@\S+$/i,
-                  message: 'Email 格式不正確'
-                }
-              })}
-              className={`form-control ${errors.email && 'is-invalid'}`}
-            />
-            {errors.email && (
-              <div className='invalid-feedback'>{errors?.email?.message}</div>
-            )}
-          </div>
-          <div className='mb-3'>
-            <label htmlFor='tel' className='form-label'>
-              電話
-            </label>
-            <input
-              id='tel'
-              type='tel'
-              {...register('tel', {
-                required: {
-                  value: true,
-                  message: '電話為必填'
-                },
-                minLength: {
-                  value: 6,
-                  message: '電話不少於 6 碼',
-                },
-                maxLength: {
-                  value: 12,
-                  message: '電話不大於 12 碼',
-                } 
-              })}
-              className={`form-control ${errors.tel && 'is-invalid'}`}
-            />
-            {errors.tel && (
-              <div className='invalid-feedback'>{errors?.tel?.message}</div>
-            )}
-          </div>
-          <div className="mb-3"> 
-            <div className="form-check">
-              <input id="checkList1" type="checkbox"
-              className={`form-check-input ${errors.like && 'is-invalid'}`}
-              {...register('like', {required: true})} name="like" value='炒麵' />
-              <label className='form-check-label' htmlFor="checkList1">炒麵</label>
-            </div>
-            <div className="form-check">
-              <input id="checkList2" type="checkbox"
-              className={`form-check-input ${errors.like && 'is-invalid'}`}
-              {...register('like', {required: true})} name="like" value='鍋燒意麵' />
-              <label className='form-check-label' htmlFor="checkList2">鍋燒意麵</label>
-            </div>
-            <div className="form-check">
-              <input id="checkList3" type="checkbox"
-              className={`form-check-input ${errors.like && 'is-invalid'}`}
-              {...register('like', {required: true})} name="like" value='炸薯條' />
-              <label className='form-check-label' htmlFor="checkList3">炸薯條</label>
-            </div>
-            {errors.like && (
-              <div className='invalid-feedback'>請選擇喜愛的食物</div>
-            )}
-          </div>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          {/* 使用 Input 元件 - 程式碼變得超簡潔！ */}
+          <Input
+            id="username"
+            name="username"
+            label="使用者名稱"
+            register={register}
+            errors={errors}
+            rules={{
+              required: { value: true, message: '使用者名稱為必填' }
+            }}
+          />
+
+          <Input
+            id="email"
+            name="email"
+            label="Email"
+            type="email"
+            placeholder="example@mail.com"
+            register={register}
+            errors={errors}
+            rules={{
+              required: { value: true, message: 'Email 為必填' },
+              pattern: { value: /^\S+@\S+$/i, message: 'Email 格式不正確' }
+            }}
+          />
+
+          <Input
+            id="tel"
+            name="tel"
+            label="電話"
+            type="tel"
+            placeholder="0912345678"
+            register={register}
+            errors={errors}
+            rules={{
+              required: { value: true, message: '電話為必填' },
+              minLength: { value: 6, message: '電話不少於 6 碼' },
+              maxLength: { value: 12, message: '電話不大於 12 碼' }
+            }}
+          />
+
+          {/* 使用 CheckboxGroup 元件 */}
+          <CheckboxGroup
+            label="喜歡的食物"
+            name="like"
+            options={foodOptions}
+            register={register}
+            errors={errors}
+            rules={{
+              required: { value: true, message: '請選擇喜愛的食物' }
+            }}
+          />
+
           <button type='submit' className='btn btn-primary'>
             註冊
           </button>
         </form>
+
+        {/* 說明區塊 */}
+        <div className="mt-4 p-3 bg-light rounded">
+          <h5>📦 元件化的優點：</h5>
+          <ul className="mb-0">
+            <li>減少重複程式碼</li>
+            <li>統一管理樣式和結構</li>
+            <li>修改一處，全部生效</li>
+            <li>更容易測試和維護</li>
+          </ul>
+        </div>
       </div>
     );
   };

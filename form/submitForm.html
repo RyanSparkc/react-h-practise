@@ -6,28 +6,86 @@
 <div id="root"></div>
 <script type="text/babel">
   const { useState } = React
+
   const App = () => {
+    // ==================== 用物件統一管理所有表單欄位 ====================
+    // 這樣比分開寫三個 useState 更好管理！
+    const [formData, setFormData] = useState({
+      username: '',
+      password: '',
+      isCheck: false,
+    });
+
+    // ==================== 通用的 handleChange ====================
+    // 一個函式處理所有輸入欄位的變化
+    const handleChange = (e) => {
+      const { name, value, type, checked } = e.target;
+      
+      setFormData({
+        ...formData,                           // 👈 複製原本的所有欄位
+        [name]: type === 'checkbox' ? checked : value,  // 👈 只更新變動的那個欄位
+      });
+    };
+
+    // ==================== 表單送出 ====================
+    const handleSubmit = (e) => {
+      e.preventDefault();  // 👈 阻止表單預設的頁面重整行為！
+
+      // 這裡可以做表單驗證、發送 API 請求等
+      console.log('表單送出的資料：', formData);
+      alert(`
+        使用者名稱：${formData.username}
+        密碼：${formData.password}
+        確認狀態：${formData.isCheck ? '已確認' : '未確認'}
+      `);
+    };
   
-    return (<div>
-      <form >
-        <div className="mb-3">
-          <label htmlFor="username" className="form-label">使用者名稱</label
-          ><input id="username" type="text" className="form-control" name="username"
-          />
+    return (
+      <div>
+        {/* 👈 onSubmit 綁定在 form 上，不是 button 上！ */}
+        <form onSubmit={handleSubmit}>
+          <div className="mb-3">
+            <label htmlFor="username" className="form-label">使用者名稱</label>
+            <input
+              id="username"
+              type="text"
+              className="form-control"
+              name="username"                    // 👈 name 要跟 state 的 key 對應
+              value={formData.username}          // 👈 綁定值
+              onChange={handleChange}            // 👈 共用 handleChange
+            />
+          </div>
+          <div className="mb-3">
+            <label htmlFor="password" className="form-label">密碼</label>
+            <input
+              id="password"
+              type="password"
+              className="form-control"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="mb-3">
+            <label htmlFor="isCheck">確認狀態</label>
+            <input
+              id="isCheck"
+              type="checkbox"
+              name="isCheck"
+              checked={formData.isCheck}         // 👈 checkbox 用 checked
+              onChange={handleChange}
+            />
+          </div>
+          <button type="submit" className="btn btn-primary">送出</button>
+        </form>
+
+        {/* 即時顯示表單狀態（方便測試） */}
+        <div className="mt-4 p-3 bg-light rounded">
+          <h5>目前表單狀態：</h5>
+          <pre>{JSON.stringify(formData, null, 2)}</pre>
         </div>
-        <div className="mb-3">
-          <label htmlFor="password" className="form-label">密碼</label
-          ><input id="password" type="password" className="form-control" name="password"
-          />
-        </div>
-        <div className="mb-3">
-          <label htmlFor="isCheck">確認狀態</label>
-          <input id="isCheck" type="checkbox" name="isCheck"
-          />
-        </div>
-        <button type="submit" className="btn btn-primary">送出</button>
-      </form>
-    </div>)
+      </div>
+    );
   }
   
   ReactDOM.createRoot(document.querySelector('#root'))

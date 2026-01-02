@@ -6,30 +6,73 @@
 <div id="root"></div>
 <script type="text/babel">
 const { useState } = React
+
 const App = () => {
-  // #1-1 單一 checkbox
+  // ==================== #1-1 單一 checkbox ====================
+  // 單一 checkbox 用「布林值」控制（勾選 = true，未勾選 = false）
+  const [isChecked, setIsChecked] = useState(false);
 
-  // #1-2 複數 checkbox
+  // ==================== #1-2 複數 checkbox ====================
+  // 多個 checkbox 用「陣列」儲存所有被勾選的值
+  const [selectedFoods, setSelectedFoods] = useState([]);
 
+  // 準備食物選項資料
+  const foods = [
+    { id: 'checkList1', value: '炒麵' },
+    { id: 'checkList2', value: '鍋燒意麵' },
+    { id: 'checkList3', value: '炸薯條' },
+  ];
 
-  return (<div>
-  {/* #1-1 checkbox */}
-  <label htmlFor="isCheck">確認狀態 </label>
-  <input id="isCheck" type="checkbox"/>
+  // 📦 處理複數 checkbox 的函式
+  const handleFoodChange = (e) => {
+    const { value, checked } = e.target;
+    
+    if (checked) {
+      // 如果被勾選，就把值加入陣列
+      setSelectedFoods([...selectedFoods, value]);
+    } else {
+      // 如果取消勾選，就從陣列中移除
+      setSelectedFoods(selectedFoods.filter(food => food !== value));
+    }
+  };
 
-  {/* #1-2 checkList */}
-  <br/>
-  
-  <br/>
-  <label htmlFor="checkList1">炒麵</label>
-  <input id="checkList1" type="checkbox" name="like" value='炒麵' />
-  <label htmlFor="checkList2">鍋燒意麵</label>
-  <input id="checkList2" type="checkbox" name="like" value='鍋燒意麵' />
-  <label htmlFor="checkList3">炸薯條</label>
-  <input id="checkList3" type="checkbox" name="like" value='炸薯條' />
+  return (
+    <div>
+      {/* #1-1 單一 checkbox */}
+      <div className="mb-3">
+        <label htmlFor="isCheck">確認狀態 </label>
+        <input
+          id="isCheck"
+          type="checkbox"
+          checked={isChecked}                        // 👈 用 checked 綁定布林值（不是 value！）
+          onChange={(e) => setIsChecked(e.target.checked)} // 👈 用 e.target.checked 取得勾選狀態
+        />
+        <span className="ms-2">
+          {isChecked ? '✅ 已確認' : '❌ 未確認'}
+        </span>
+      </div>
 
-
-  </div>)
+      {/* #1-2 複數 checkList */}
+      <div className="mb-3">
+        <p>選擇你喜歡的食物：</p>
+        {foods.map((food) => (
+          <span key={food.id} className="me-3">
+            <input
+              id={food.id}
+              type="checkbox"
+              value={food.value}
+              checked={selectedFoods.includes(food.value)}  // 👈 判斷此值是否在陣列中
+              onChange={handleFoodChange}                    // 👈 使用獨立函式處理
+            />
+            <label htmlFor={food.id} className="ms-1">{food.value}</label>
+          </span>
+        ))}
+        <p className="mt-2 text-muted">
+          你選擇了：{selectedFoods.length > 0 ? selectedFoods.join('、') : '（尚未選擇）'}
+        </p>
+      </div>
+    </div>
+  );
 }
 
 ReactDOM.createRoot(document.querySelector('#root'))

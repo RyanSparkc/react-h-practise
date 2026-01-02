@@ -17,59 +17,132 @@
       watch,
       getValues,
       control,
+      formState: { errors },  // 👈 取得錯誤狀態
     } = useForm({
       defaultValues: {
-        username: '卡斯伯',
+        username: '',
+        email: '',
         like: []
       },
     });
+
     const onSubmit = (data) => {
-      console.log(data);
+      console.log('表單驗證通過！', data);
+      alert('註冊成功！');
     };
 
     return (
       <div>
-        <form action='' onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          {/* ===== 使用者名稱（必填驗證）===== */}
           <div className='mb-3'>
             <label htmlFor='username' className='form-label'>
-              使用者名稱
+              使用者名稱 <span className="text-danger">*</span>
             </label>
             <input
               id='username'
               type='text'
-              {...register('username')}
-              className="form-control"
-              />
-            {/*
-              `errors.username && "is-invalid"`
-              也可改寫成 `errors.username ? "is-invalid" : ""`
-              渲染後就不會出現 undefined 的額外 className
-            */}
+              {...register('username', {
+                required: '使用者名稱為必填',  // 👈 驗證規則
+              })}
+              className={`form-control ${errors.username ? 'is-invalid' : ''}`}
+            />
+            {/* 顯示錯誤訊息 */}
+            {errors.username && (
+              <div className="invalid-feedback">
+                {errors.username.message}
+              </div>
+            )}
           </div>
-          <div className="mb-3"> 
-            <div className="form-check">
-              <input id="checkList1" type="checkbox"
-              className="form-check-input"
-              {...register('like')} name="like" value='炒麵' />
-              <label className='form-check-label' htmlFor="checkList1">炒麵</label>
-            </div>
-            <div className="form-check">
-              <input id="checkList2" type="checkbox"
-              className="form-check-input"
-              {...register('like')} name="like" value='鍋燒意麵' />
-              <label className='form-check-label' htmlFor="checkList2">鍋燒意麵</label>
-            </div>
-            <div className="form-check">
-              <input id="checkList3" type="checkbox"
-              className="form-check-input"
-              {...register('like')} name="like" value='炸薯條' />
-              <label className='form-check-label' htmlFor="checkList3">炸薯條</label>
-            </div>
+
+          {/* ===== Email（必填 + 格式驗證）===== */}
+          <div className='mb-3'>
+            <label htmlFor='email' className='form-label'>
+              Email <span className="text-danger">*</span>
+            </label>
+            <input
+              id='email'
+              type='text'
+              {...register('email', {
+                required: 'Email 為必填',
+                pattern: {
+                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                  message: 'Email 格式不正確',
+                },
+              })}
+              className={`form-control ${errors.email ? 'is-invalid' : ''}`}
+            />
+            {errors.email && (
+              <div className="invalid-feedback">
+                {errors.email.message}
+              </div>
+            )}
           </div>
+
+          {/* ===== Checkbox（至少選一個）===== */}
+          <div className="mb-3">
+            <label className="form-label">喜歡的食物 <span className="text-danger">*</span></label>
+            <div className={`${errors.like ? 'is-invalid' : ''}`}>
+              <div className="form-check">
+                <input 
+                  id="checkList1" 
+                  type="checkbox"
+                  className="form-check-input"
+                  {...register('like', {
+                    validate: (value) => value.length > 0 || '請至少選擇一個'
+                  })} 
+                  value='炒麵' 
+                />
+                <label className='form-check-label' htmlFor="checkList1">炒麵</label>
+              </div>
+              <div className="form-check">
+                <input 
+                  id="checkList2" 
+                  type="checkbox"
+                  className="form-check-input"
+                  {...register('like')} 
+                  value='鍋燒意麵' 
+                />
+                <label className='form-check-label' htmlFor="checkList2">鍋燒意麵</label>
+              </div>
+              <div className="form-check">
+                <input 
+                  id="checkList3" 
+                  type="checkbox"
+                  className="form-check-input"
+                  {...register('like')} 
+                  value='炸薯條' 
+                />
+                <label className='form-check-label' htmlFor="checkList3">炸薯條</label>
+              </div>
+            </div>
+            {errors.like && (
+              <div className="text-danger small mt-1">
+                {errors.like.message}
+              </div>
+            )}
+          </div>
+
           <button type='submit' className='btn btn-primary'>
             註冊
           </button>
         </form>
+
+        {/* 顯示錯誤狀態 */}
+        <div className="mt-4 p-3 bg-light rounded">
+          <h5>📋 目前的驗證錯誤：</h5>
+          {Object.keys(errors).length === 0 ? (
+            <p className="text-success mb-0">✅ 沒有錯誤</p>
+          ) : (
+            <ul className="mb-0">
+              {Object.keys(errors).map((fieldName) => (
+                <li key={fieldName} className="text-danger">
+                  <strong>{fieldName}</strong>：{errors[fieldName]?.message}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
     );
   };

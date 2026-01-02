@@ -8,25 +8,101 @@
 <script src="https://cdn.jsdelivr.net/npm/react-hook-form@7.33.1/dist/index.umd.min.js"></script>
 <script type="text/babel">
   const { useState, useEffect } = React;
-  const { useForm } = ReactHookForm;
+  const { useForm, useWatch } = ReactHookForm;
 
   const App = () => {
     const {
       register,
       handleSubmit,
-    } = useForm();
-    const onSubmit = (data) => {
-      console.log(data);
+      watch,       // 監聽欄位值
+      control,     // 給 useWatch 使用
+      setValue,    // 👈 程式化設定值
+      getValues,   // 👈 取得值（不觸發渲染）
+      reset,       // 👈 重置表單
+    } = useForm({
+      // ==================== defaultValues 設定預設值 ====================
+      defaultValues: {
+        username: '卡斯伯',        // 設定預設使用者名稱
+        foods: ['炒麵'],           // 預設勾選「炒麵」
+      }
+    });
+
+    // ==================== setValue 程式化設定值 ====================
+    const handleSetValue = () => {
+      setValue('username', '小明');  // 設定 username 為「小明」
     };
 
-    // #watch 當有值寫入時，可以透過 watch 觸發
+    // ==================== getValues 取得當前值 ====================
+    const handleGetValues = () => {
+      const currentValues = getValues();  // 取得所有欄位值
+      console.log('當前表單值：', currentValues);
+      alert(`當前值：${JSON.stringify(currentValues, null, 2)}`);
+    };
 
-    // #useWatch 使用 hook 實作監聽
+    // ==================== reset 重置表單 ====================
+    const handleReset = () => {
+      reset();  // 重置回 defaultValues
+    };
 
+    // 全選/取消全選食物
+    const handleSelectAllFoods = () => {
+      setValue('foods', ['炒麵', '鍋燒意麵', '炸薯條']);
+    };
+
+    const handleClearFoods = () => {
+      setValue('foods', []);
+    };
+
+    const onSubmit = (data) => {
+      console.log('表單資料：', data);
+      alert(`
+        使用者：${data.username}
+        喜歡的食物：${data.foods?.join('、') || '無'}
+      `);
+    };
+
+    // ==================== #watch 方法一：直接呼叫 watch ====================
+    // watch 可以監聽特定欄位，當欄位值改變時會觸發重新渲染
+    const watchUsername = watch('username');
+    const watchFoods = watch('foods');
+
+    // ==================== #useWatch 方法二：使用 useWatch Hook ====================
+    // useWatch 是另一種監聽方式，效能更好（只有被監聯的欄位變化時才重新渲染）
+    const usernameValue = useWatch({
+      control,          // 必須傳入 control
+      name: 'username', // 監聯的欄位名稱
+    });
+
+    // ==================== #watch 方法三：訂閱模式（需要 useEffect）====================
+    // 當需要在值變化時「執行副作用」時使用，例如：A 欄位變化時自動更新 B 欄位
+    const [lastChangedField, setLastChangedField] = useState('');
+    
+    useEffect(() => {
+      // watch 傳入 callback，會在任何欄位變化時執行
+      const subscription = watch((value, { name }) => {
+        console.log(`欄位 [${name}] 變化了，目前值：`, value);
+        setLastChangedField(name || '');
+        
+        // 範例：當 foods 選擇超過 2 個時，自動在 console 提示
+        if (name === 'foods' && value.foods?.length > 2) {
+          console.log('🎉 你選了超過 2 種食物！');
+        }
+      });
+      
+      // ⚠️ 重要：元件卸載時要取消訂閱，避免記憶體洩漏
+      return () => subscription.unsubscribe();
+    }, [watch]);
+
+    // 準備食物選項
+    const foodOptions = [
+      { id: 'checkList1', value: '炒麵' },
+      { id: 'checkList2', value: '鍋燒意麵' },
+      { id: 'checkList3', value: '炸薯條' },
+    ];
 
     return (
       <div>
-        <form action='' onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <div className='mb-3'>
             <label htmlFor='username' className='form-label'>
               使用者名稱
@@ -38,18 +114,91 @@
               className='form-control'
             />
           </div>
-          <div className="mb-3"> 
-          <label htmlFor="checkList1">炒麵</label>
-            <input id="checkList1" type="checkbox" name="like" value='炒麵' />
-            <label htmlFor="checkList2">鍋燒意麵</label>
-            <input id="checkList2" type="checkbox" name="like" value='鍋燒意麵' />
-            <label htmlFor="checkList3">炸薯條</label>
-            <input id="checkList3" type="checkbox" name="like" value='炸薯條' />
+
+          {/* Checkbox 在 React Hook Form 中的處理 */}
+          <div className="mb-3">
+            <p className="mb-2">喜歡的食物：</p>
+            {foodOptions.map((food) => (
+              <span key={food.id} className="me-3">
+                <input
+                  id={food.id}
+                  type="checkbox"
+                  value={food.value}
+                  {...register('foods')}
+                />
+                <label htmlFor={food.id} className="ms-1">{food.value}</label>
+              </span>
+            ))}
           </div>
+
           <button type='submit' className='btn btn-primary'>
             註冊
           </button>
         </form>
+
+        {/* ===== setValue / getValues / reset 操作區 ===== */}
+        <div className="mt-4 p-3 border rounded">
+          <h5>📦 值操作功能：</h5>
+          <div className="d-flex flex-wrap gap-2">
+            <button 
+              type="button" 
+              className="btn btn-outline-primary btn-sm"
+              onClick={handleSetValue}
+            >
+              setValue：設為「小明」
+            </button>
+            <button 
+              type="button" 
+              className="btn btn-outline-info btn-sm"
+              onClick={handleGetValues}
+            >
+              getValues：取得當前值
+            </button>
+            <button 
+              type="button" 
+              className="btn btn-outline-secondary btn-sm"
+              onClick={handleReset}
+            >
+              reset：重置表單
+            </button>
+            <button 
+              type="button" 
+              className="btn btn-outline-success btn-sm"
+              onClick={handleSelectAllFoods}
+            >
+              全選食物
+            </button>
+            <button 
+              type="button" 
+              className="btn btn-outline-danger btn-sm"
+              onClick={handleClearFoods}
+            >
+              清空食物
+            </button>
+          </div>
+        </div>
+
+        {/* 顯示 watch 監聽的值 */}
+        <div className="mt-4 p-3 bg-light rounded">
+          <h5>📡 watch 監聽結果：</h5>
+          <p className="mb-1">
+            <code>watch('username')</code>：<strong>{watchUsername}</strong>
+          </p>
+          <p className="mb-1">
+            <code>watch('foods')</code>：<strong>{watchFoods?.join('、') || '（無）'}</strong>
+          </p>
+          <hr />
+          <h5>📡 useWatch 監聽結果：</h5>
+          <p className="mb-1">
+            <code>useWatch(username)</code>：<strong>{usernameValue}</strong>
+          </p>
+          <hr />
+          <h5>📡 訂閱模式監聽結果（看 Console）：</h5>
+          <p className="mb-0">
+            最後變化的欄位：<strong className="text-primary">{lastChangedField || '（尚無變化）'}</strong>
+          </p>
+          <small className="text-muted">打開瀏覽器 Console 可看到詳細 log</small>
+        </div>
       </div>
     );
   };

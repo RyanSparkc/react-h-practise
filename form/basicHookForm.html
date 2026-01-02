@@ -3,31 +3,62 @@
 <div class="container main my-5"><div class="row"><main class="col post">
 <!-- 章節標題 --><div class="mb-4"><h1 class="mt-0 text-muted">React Hook Form 基礎</h1><small>檔名：<code>basicHookForm.html</code></small></div>
 <!-- 🔥🔥練習開始🔥🔥 -->
-<!-- <script src="https://cdn.jsdelivr.net/npm/react-hook-form@7.33.1/dist/index.umd.min.js"></script> -->
+<!-- 引入 React Hook Form -->
+<script src="https://cdn.jsdelivr.net/npm/react-hook-form@7.33.1/dist/index.umd.min.js"></script>
 <div id="app"></div>
 <script type="text/babel">
   const { useState, useEffect } = React;
+  // 從 ReactHookForm 取出需要的方法
+  const { useForm } = ReactHookForm;
 
   const App = () => {
+    // ==================== 使用 useForm ====================
+    // useForm 回傳一個物件，包含許多處理表單的工具
+    const {
+      register,      // 用來註冊表單欄位
+      handleSubmit,  // 用來處理表單送出
+      formState: { errors },  // 取得錯誤狀態（之後會用到）
+    } = useForm();
+
+    // 表單送出時執行的函式
+    const onSubmit = (data) => {
+      // data 會自動包含所有 register 過的欄位值！
+      console.log('表單資料：', data);
+      alert(`歡迎 ${data.username}！`);
+    };
 
     return (
       <div>
-        <form action=''>
+        {/* handleSubmit 會先做驗證，驗證通過才執行 onSubmit */}
+        <form onSubmit={handleSubmit(onSubmit)}>
           <div className='mb-3'>
             <label htmlFor='username' className='form-label'>
               使用者名稱
             </label>
+            {/* 使用 register 註冊欄位，取代原本的 value + onChange */}
             <input
               id='username'
               type='text'
               defaultValue="卡斯伯"
               className='form-control'
+              {...register('username')}
             />
           </div>
           <button type='submit' className='btn btn-primary'>
             註冊
           </button>
         </form>
+
+        {/* 顯示說明 */}
+        <div className="mt-4 p-3 bg-light rounded">
+          <h5>React Hook Form 優點：</h5>
+          <ul className="mb-0">
+            <li>不需要寫 useState</li>
+            <li>不需要寫 onChange</li>
+            <li>只需要 <code>register('欄位名稱')</code></li>
+            <li>效能更好（不會每次輸入都重新渲染）</li>
+          </ul>
+        </div>
       </div>
     );
   };

@@ -49,25 +49,44 @@
           </div>
           <div className='mb-3'>
             <label htmlFor='email' className='form-label'>
-              Email
+              Email <span className="text-danger">*</span>
             </label>
             <input
               id='email'
               type='text'
-              {...register('email')}
+              {...register('email', {
+                required: 'Email 為必填',
+                pattern: {
+                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                  message: 'Email 格式不正確，例如：example@mail.com',
+                },
+              })}
               className={`form-control ${errors.email && 'is-invalid'}`}
             />
+            {errors.email && (
+              <div className='invalid-feedback'>{errors.email.message}</div>
+            )}
           </div>
           <div className='mb-3'>
             <label htmlFor='tel' className='form-label'>
-              電話
+              手機號碼 <span className="text-danger">*</span>
             </label>
             <input
               id='tel'
               type='tel'
-              {...register('tel')}
+              placeholder="例如：0912345678"
+              {...register('tel', {
+                required: '手機號碼為必填',
+                pattern: {
+                  value: /^09\d{8}$/,
+                  message: '手機號碼格式不正確，需為 09 開頭的 10 碼數字',
+                },
+              })}
               className={`form-control ${errors.tel && 'is-invalid'}`}
             />
+            {errors.tel && (
+              <div className='invalid-feedback'>{errors.tel.message}</div>
+            )}
           </div>
           <div className="mb-3"> 
             <div className="form-check">

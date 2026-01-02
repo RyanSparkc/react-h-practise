@@ -6,23 +6,90 @@
 <div id="root"></div>
 <script type="text/babel">
 const { useState } = React
+
 const App = () => {
+  // ==================== #1 Input 文字輸入框 ====================
+  // 使用 useState 建立狀態來儲存使用者輸入的值
+  const [username, setUsername] = useState('');
 
-  return (<div>
-  {/* #1 input */}
-  <label htmlFor="username">使用者名稱 </label>
-  <input id="username" type="text"/>
+  // ==================== #2 Select 單選下拉選單 ====================
+  // 用 useState 儲存被選中的城市
+  const [city, setCity] = useState('');
+  
+  // 準備選項資料（通常會從 API 取得）
+  const cities = [
+    { value: 'taipei', label: '台北' },
+    { value: 'taichung', label: '台中' },
+    { value: 'kaohsiung', label: '高雄' },
+  ];
 
-  {/* #2 select 選擇、預設值 */}
-  <select name="" id="" >
-    <option value="" disabled>-- 請選擇地區 --</option>
-  </select>
+  // ==================== #3 MultiSelect 多選下拉選單 ====================
+  // 多選需要用「陣列」來儲存多個選中的值
+  const [selectedCities, setSelectedCities] = useState([]);
 
-  {/* #3 multiSelect */}
-  <select name="" id="">
+  // 📦 抽出成獨立函式，程式碼更清晰
+  const handleMultiSelectChange = (e) => {
+    // 1. 取得所有被選中的 option 元素
+    // 2. 轉成陣列並取出每個 option 的 value
+    const values = Array.from(e.target.selectedOptions)
+      .map(opt => opt.value);
+    setSelectedCities(values);
+  };
 
-  </select>
-  </div>)
+  return (
+    <div>
+      {/* #1 input - 受控元件的寫法 */}
+      <div className="mb-3">
+        <label htmlFor="username">使用者名稱 </label>
+        <input 
+          id="username" 
+          type="text"
+          className="form-control"
+          value={username}                              // 👈 綁定 state，讓 React 控制顯示內容
+          onChange={(e) => setUsername(e.target.value)} // 👈 監聽輸入事件，更新 state
+        />
+        {/* 即時顯示輸入的內容 */}
+        <small className="text-muted">你輸入的名稱：{username}</small>
+      </div>
+
+      {/* #2 select 單選 */}
+      <div className="mb-3">
+        <label>選擇城市（單選）</label>
+        <select 
+          className="form-select"
+          value={city}                              // 👈 綁定選中的值
+          onChange={(e) => setCity(e.target.value)} // 👈 選擇時更新 state
+        >
+          <option value="" disabled>-- 請選擇地區 --</option>
+          {/* 使用 .map() 動態產生選項 */}
+          {cities.map((item) => (
+            <option key={item.value} value={item.value}>
+              {item.label}
+            </option>
+          ))}
+        </select>
+        <small className="text-muted">你選擇的城市：{city}</small>
+      </div>
+
+      {/* #3 multiSelect 多選 */}
+      <div className="mb-3">
+        <label>選擇城市（多選，按住 Ctrl/Cmd 可多選）</label>
+        <select 
+          className="form-select"
+          multiple                                   // 👈 開啟多選模式
+          value={selectedCities}                     // 👈 綁定陣列
+          onChange={handleMultiSelectChange}       // 👈 使用獨立函式
+        >
+          {cities.map((item) => (
+            <option key={item.value} value={item.value}>
+              {item.label}
+            </option>
+          ))}
+        </select>
+        <small className="text-muted">你選擇的城市：{selectedCities.join(', ')}</small>
+      </div>
+    </div>
+  );
 }
 
 ReactDOM.createRoot(document.querySelector('#root'))
